@@ -9,17 +9,19 @@ import java.util.Vector;
  * It contains a set of methods execute user commands.
  */
 public class GameWorld implements Observable {
-    private GameObjectCollection gameWorldObj
+    private GameObjectCollection worldObjects;
     private Vector observers;
     private float randomX;
     private float randomY;
     private Random randomGenerator;
     private int numberPylons;
+    private int numberNpcs;
 
     public GameWorld(){
-        worldObjects = new Vector();
+        worldObjects = new GameObjectCollection();
         randomGenerator = new Random();
         numberPylons = 5;
+        numberNpcs = 3;
     }
 
     /*
@@ -35,6 +37,15 @@ public class GameWorld implements Observable {
         for(int i = 2; i<=numberPylons; i++){
             worldObjects.add(new Pylon(randomGenerator.nextFloat() * 1000, randomGenerator.nextFloat() * 1000, i));
         }
+        for(int i = 1; i<=numberNpcs; i++){
+            NpcCar temp = new NpcCar(startX+ (randomGenerator.nextFloat() * 12), startY+ (randomGenerator.nextFloat() * 20), i);
+            if((randomGenerator.nextFloat() * 12) > 7){
+                temp.setStrategy(new DerbyStrategy());
+            } else{
+                temp.setStrategy(new WinStrategy());
+            }
+            worldObjects.add(temp);
+        }
         worldObjects.add(new OilSlick(randomGenerator.nextFloat() * 1000,randomGenerator.nextFloat() * 1000));
         worldObjects.add(new OilSlick(randomGenerator.nextFloat() * 1000,randomGenerator.nextFloat() * 1000));
         worldObjects.add(new OilSlick(randomGenerator.nextFloat() * 1000,randomGenerator.nextFloat() * 1000));
@@ -49,8 +60,10 @@ public class GameWorld implements Observable {
      * method of that car to increase the speed.
      */
     public void accelerateCar(){
-        for(Object gwObject : worldObjects){
-            if(gwObject instanceof Car){
+        Iterator theCollection = worldObjects.getIterator();
+        while(theCollection.hasNext()){
+            Object gwObject = theCollection.getNext();
+            if(!(gwObject instanceof NpcCar) && (gwObject instanceof Car)){
                 Car car = (Car)gwObject;
                 car.accelerate();
             }
@@ -61,8 +74,10 @@ public class GameWorld implements Observable {
      * method of that car to decrease the speed.
      */
     public void brakeCar(){
-        for(Object gwObject : worldObjects){
-            if(gwObject instanceof Car){
+        Iterator theCollection = worldObjects.getIterator();
+        while(theCollection.hasNext()){
+            Object gwObject = theCollection.getNext();
+            if(!(gwObject instanceof NpcCar) && (gwObject instanceof Car)){
                 Car car = (Car)gwObject;
                 car.brake();
             }
@@ -73,25 +88,32 @@ public class GameWorld implements Observable {
      * method of that car to adjust the steering direction of the car
      */
     public void steerCarLeft(){
-        for(Object gwObject : worldObjects){
-            if(gwObject instanceof Car){
+        Iterator theCollection = worldObjects.getIterator();
+        while(theCollection.hasNext()){
+            Object gwObject = theCollection.getNext();
+            if(!(gwObject instanceof NpcCar) && (gwObject instanceof Car)){
                 Car car = (Car)gwObject;
-                car.steerLeft();
+                    car.steerLeft();
             }
         }
     }
+
+
     /**
      * This method finds the car object in the vector and then calls the steerRight
      * method of that car to adjust the steering direction of the car
      */
     public void steerCarRight(){
-        for(Object gwObject : worldObjects){
-            if(gwObject instanceof Car){
+        Iterator theCollection = worldObjects.getIterator();
+        while(theCollection.hasNext()){
+            Object gwObject = theCollection.getNext();
+            if(!(gwObject instanceof NpcCar) && (gwObject instanceof Car)){
                 Car car = (Car)gwObject;
                 car.steerRight();
             }
         }
     }
+
 
     /**
      * This method creates a new randomly located oil slick in the game world
@@ -106,8 +128,10 @@ public class GameWorld implements Observable {
 
     public void loseLife(){
         Car car = new Car();
-        for(Object gwObject : worldObjects){
-            if(gwObject instanceof Car){
+        Iterator theCollection = worldObjects.getIterator();
+        while(theCollection.hasNext()){
+            Object gwObject = theCollection.getNext();
+            if(!(gwObject instanceof NpcCar) && (gwObject instanceof Car)){
                 car = (Car)gwObject;
                 break;
             }
@@ -123,19 +147,37 @@ public class GameWorld implements Observable {
 
     //returns True if the car can continue to play after collision
     public boolean carCollision(){
-        for(Object gwObject : worldObjects){
-            if(gwObject instanceof Car){
-                Car car = (Car)gwObject;
-                car.damaged(new Car());
-                return (car.canMove());
+        Iterator theCollection = worldObjects.getIterator();
+        Car car = null;
+        NpcCar npcCar = null;
+        while(theCollection.hasNext()){
+            Object gwObject = theCollection.getNext();
+            if(gwObject instanceof NpcCar){
+                npcCar = (NpcCar)gwObject;
+            }
+            if(!(gwObject instanceof NpcCar) && (gwObject instanceof Car)){
+                car = (Car)gwObject;
             }
         }
-        return false;
+        car.damaged(npcCar);
+        npcCar.damaged(car);
+        if (!npcCar.canMove()){
+            int carNum = npcCar.getNpcNumber();
+            worldObjects.remove(npcCar);
+            createNpcCar(carNum);
+        }
+        return (car.canMove());
+    }
+
+    public void createNpcCar(int carNumber){
+        worldObjects.add(new NpcCar(randomGenerator.nextFloat() * 1000,randomGenerator.nextFloat() * 1000, carNumber));
     }
 
     public boolean birdCollision(){
-        for(Object gwObject : worldObjects){
-            if(gwObject instanceof Car){
+        Iterator theCollection = worldObjects.getIterator();
+        while(theCollection.hasNext()){
+            Object gwObject = theCollection.getNext();
+            if(!(gwObject instanceof NpcCar) && (gwObject instanceof Car)){
                 Car car = (Car)gwObject;
                 car.damaged(new Bird());
                 return (car.canMove());
@@ -144,8 +186,10 @@ public class GameWorld implements Observable {
         return false;
     }
     public boolean pylonExists(int pylonNum){
-        for(Object gwObject : worldObjects) {
-            if (gwObject instanceof Pylon) {
+        Iterator theCollection = worldObjects.getIterator();
+        while(theCollection.hasNext()){
+            Object gwObject = theCollection.getNext();
+            if(gwObject instanceof Pylon){
                 Pylon p = (Pylon) gwObject;
                 if (p.getSequenceNumber() == pylonNum) {
                     return true;
@@ -157,8 +201,8 @@ public class GameWorld implements Observable {
 
     public void pylonCollision(int pylonNum){
         Car car = new Car();
-        for(Object gwObject : worldObjects) {
-            if (gwObject instanceof Car) {
+        Iterator theCollection = worldObjects.getIterator();         while(theCollection.hasNext()){             Object gwObject = theCollection.getNext();
+            if (!(gwObject instanceof NpcCar) && (gwObject instanceof Car)) {
                 car = (Car) gwObject;
             }
         }
@@ -172,9 +216,9 @@ public class GameWorld implements Observable {
 
     public void fuelCanCollision(){
         Object delete = null;
-        for(Object gwObject : worldObjects){
+        Iterator theCollection = worldObjects.getIterator();         while(theCollection.hasNext()){             Object gwObject = theCollection.getNext();
             if(gwObject instanceof FuelCan){
-                Car car = (Car)worldObjects.get(0);
+                Car car = findPlayersCar();
                 car.addFuel(((FuelCan) gwObject).getSize());
                 delete = gwObject;
                 createFuelCan();
@@ -184,9 +228,21 @@ public class GameWorld implements Observable {
         worldObjects.remove(delete);
     }
 
+    public Car findPlayersCar(){
+        Iterator theCollection = worldObjects.getIterator();
+        while(theCollection.hasNext()){
+            Object gwObject = theCollection.getNext();
+            if(!(gwObject instanceof NpcCar) && (gwObject instanceof Car)){
+                Car car = (Car)gwObject;
+                return car;
+            }
+        }
+        return null;
+    }
+
     public void carEnteredOilSlick(){
-        for(Object gwObject : worldObjects){
-            if(gwObject instanceof Car){
+        Iterator theCollection = worldObjects.getIterator();         while(theCollection.hasNext()){             Object gwObject = theCollection.getNext();
+            if(!(gwObject instanceof NpcCar) && (gwObject instanceof Car)){
                 Car car = (Car)gwObject;
                 car.setStuck(true);
             }
@@ -194,8 +250,8 @@ public class GameWorld implements Observable {
     }
 
     public void carExitedOilSlick(){
-        for(Object gwObject : worldObjects){
-            if(gwObject instanceof Car){
+        Iterator theCollection = worldObjects.getIterator();         while(theCollection.hasNext()){             Object gwObject = theCollection.getNext();
+            if(!(gwObject instanceof NpcCar) && (gwObject instanceof Car)){
                 Car car = (Car)gwObject;
                 car.setStuck(false);
             }
@@ -204,7 +260,7 @@ public class GameWorld implements Observable {
 
     //Changes the color of every object who is of type IColorable
     public void changeObjectsColors(){
-        for(Object gwObject : worldObjects){
+        Iterator theCollection = worldObjects.getIterator();         while(theCollection.hasNext()){             Object gwObject = theCollection.getNext();
             if(gwObject instanceof IColorable){
                 IColorable obj = (IColorable)gwObject;
                 obj.changeColor();
@@ -213,7 +269,7 @@ public class GameWorld implements Observable {
     }
 
     public void updateAllMoveables(){
-        for(Object gwObject : worldObjects){
+        Iterator theCollection = worldObjects.getIterator();         while(theCollection.hasNext()){             Object gwObject = theCollection.getNext();
             if(gwObject instanceof Moveable){
                 Moveable obj = (Moveable)gwObject;
                 obj.move();
@@ -222,8 +278,10 @@ public class GameWorld implements Observable {
     }
 
     public boolean carCanMove(){
-        for(Object gwObject : worldObjects) {
-            if (gwObject instanceof Car) {
+        Iterator theCollection = worldObjects.getIterator();
+        while(theCollection.hasNext()){
+            Object gwObject = theCollection.getNext();
+            if (!(gwObject instanceof NpcCar) && (gwObject instanceof Car)) {
                 Car car = (Car) gwObject;
                 return car.canMove();
             }
@@ -232,8 +290,8 @@ public class GameWorld implements Observable {
     }
 
     public int getHighestPylon(){
-        for(Object gwObject : worldObjects) {
-            if (gwObject instanceof Car) {
+        Iterator theCollection = worldObjects.getIterator();         while(theCollection.hasNext()){             Object gwObject = theCollection.getNext();
+            if (!(gwObject instanceof NpcCar) && (gwObject instanceof Car)) {
                 Car car = (Car) gwObject;
                 return car.getCheckPoint();
             }
@@ -242,8 +300,8 @@ public class GameWorld implements Observable {
     }
 
     public int getCarFuelLevel(){
-        for(Object gwObject : worldObjects) {
-            if (gwObject instanceof Car) {
+        Iterator theCollection = worldObjects.getIterator();         while(theCollection.hasNext()){             Object gwObject = theCollection.getNext();
+            if (!(gwObject instanceof NpcCar) && (gwObject instanceof Car)) {
                 Car car = (Car) gwObject;
                 return car.getFuelLevel();
             }
@@ -252,8 +310,8 @@ public class GameWorld implements Observable {
     }
 
     public int getCarDamageLevel(){
-        for(Object gwObject : worldObjects) {
-            if (gwObject instanceof Car) {
+        Iterator theCollection = worldObjects.getIterator();         while(theCollection.hasNext()){             Object gwObject = theCollection.getNext();
+            if (!(gwObject instanceof NpcCar) && (gwObject instanceof Car)) {
                 Car car = (Car) gwObject;
                 return car.getDamageLevel();
             }
@@ -265,17 +323,9 @@ public class GameWorld implements Observable {
         observers.add(obs);
     }
 
-
-
-
-
-    public String toString(){
-        String string = "";
-        int count = worldObjects.size();
-        for(int i = 0; i<count; i++){
-            string = string + worldObjects.get(i).toString() + "\n";
-        }
-        return string;
+    public void notifyObservers(){
+        //MapView is going to have different values
+        //
     }
 
 }

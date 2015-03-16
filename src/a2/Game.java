@@ -1,5 +1,10 @@
 package a2;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Scanner;
+import java.util.Vector;
 
 /**
  * Created by Tiffany Chiapuzio-Wong on 2/19/15.
@@ -7,14 +12,85 @@ import java.util.Scanner;
  * This class manages the flow of control in the game (controller).
  * This class also display information about the state of the game.
  */
-public class Game {
+public class Game extends JFrame implements ActionListener {
+    private GameWorld gw;
+    private MapView mv;
+    private ScoreView sv;
+
+
     public Game(){
-        GameWorld gw = new GameWorld();
-        gw.initLayout();
-        play(gw);
+        //gw = new GameWorld();
+        //gw.initLayout();
+        establishFrame();
+        //play(gw);
+        setVisible(true);
+    }
+
+    /**
+     * This method creates the basic layout of the game and adds all the relative
+     * components such as buttons, menus, and labels.
+     */
+    public void establishFrame(){
+        setTitle("The Wong Way: 2 Wongz Don't Make A Whight, Part XIV");
+        setSize(1000, 825);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+        createNorth();
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
     }
 
+    public void createNorth(){
+        //add scoreview
+        //create menu
+        JMenuBar bar = new JMenuBar();
+
+        //Menus
+        JMenu fileMenu = new JMenu("File");
+        JMenu commandMenu = new JMenu("Commands");
+
+        //File Menu Items
+        JMenuItem nItem = new JMenuItem("New");
+        nItem.addActionListener(this);
+        fileMenu.add(nItem);
+
+        JMenuItem sveItem = new JMenuItem("Save");
+        sveItem.addActionListener(this);
+        fileMenu.add(sveItem);
+
+        JMenuItem sndItem = new JMenuItem("Sound");
+        sndItem.addActionListener(this);
+        fileMenu.add(sndItem);
+
+        JMenuItem abtItem = new JMenuItem("About");
+        abtItem.addActionListener(this);
+        fileMenu.add(abtItem);
+
+        JMenuItem qtItem = new JMenuItem("Quit");
+        qtItem.addActionListener(this);
+        fileMenu.add(qtItem);
+
+        //Command Menu Items
+        JMenuItem oilItem = new JMenuItem("Add Oil Slick");
+        oilItem.addActionListener(this);
+        commandMenu.add(oilItem);
+
+        JMenuItem fuelItem = new JMenuItem("Pick Up Fuel Can");
+        fuelItem.addActionListener(this);
+        commandMenu.add(fuelItem);
+
+        JMenuItem colorItem = new JMenuItem("New Colors");
+        colorItem.addActionListener(this);
+        commandMenu.add(colorItem);
+
+        bar.add(fileMenu);
+        bar.add(commandMenu);
+
+
+        setJMenuBar(bar);
+
+
+    }
     /**
      * This method accepts and executes user commands that operate
      * on the GameWorld object.
@@ -169,6 +245,7 @@ public class Game {
         return true;
     }
 
+
     public static String display(int lives, int clock, GameWorld gw){
         String output = "Lives : " + lives + "\nClock: " + clock;
         if(clock == 1){
@@ -178,6 +255,28 @@ public class Game {
         }
         output = output + "\nHighest Pylon Reached: " + gw.getHighestPylon() + "\nFuel Level: " + gw.getCarFuelLevel() + "\nDamage Level: " + gw.getCarDamageLevel();
         return output;
+    }
+
+    public void actionPerformed(ActionEvent e){
+        if(e.getActionCommand().equalsIgnoreCase("new")){
+            System.out.println("success");
+        } else if(e.getActionCommand().equalsIgnoreCase("save")){
+
+        } else if(e.getActionCommand().equalsIgnoreCase("sound")){
+
+        } else if(e.getActionCommand().equalsIgnoreCase("save")){
+
+        } else if(e.getActionCommand().equalsIgnoreCase("about")){
+
+        } else if(e.getActionCommand().equalsIgnoreCase("quit")){
+
+        } else if(e.getActionCommand().equalsIgnoreCase("add oil slick")){
+
+        } else if(e.getActionCommand().equalsIgnoreCase("pick up fuel can")){
+
+        } else if(e.getActionCommand().equalsIgnoreCase("new colors")){
+
+        }
     }
 }
 

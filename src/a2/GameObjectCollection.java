@@ -20,6 +20,10 @@ public class GameObjectCollection implements Collection {
         return new GameObjectIterator();
     }
 
+    public void remove(Object x){
+        objectCollection.remove(x);
+    }
+
     private class GameObjectIterator implements Iterator{
         private int currentIndex;
 

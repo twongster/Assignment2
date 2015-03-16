@@ -35,6 +35,8 @@ public class Car extends Moveable implements ISteerable, IColorable {
         this.setStuck(false);
     }
 
+
+
     public Car(float locationX, float locationY, int checkPoint){
         this.setWidth(15);
         this.setLength(27);
@@ -64,6 +66,7 @@ public class Car extends Moveable implements ISteerable, IColorable {
     }
 
     //Getter and setter Methods that allow manipulation of the Car's attributes
+
     public void setWidth(int width) {
         this.width = width;
     }
