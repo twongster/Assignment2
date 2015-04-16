@@ -18,7 +18,7 @@ public class GameWorld implements Observable, IGameWorld, ActionListener {
     private float randomX;
     private float randomY;
     private Random randomGenerator;
-    private int numberPylons, size, numberNpcs, clock, lives;
+    private int numberPylons, size, numberNpcs, clock, lives, called;
     private boolean sound;
     private Timer timer;
     private final int DELAY_IN_MSEC = 20;
@@ -481,8 +481,7 @@ public class GameWorld implements Observable, IGameWorld, ActionListener {
         return temp;
     }
 
-    @Override
-    public void updateAllMoveables(){
+    public void updateAllMoveables(int called){
         Iterator theCollection = worldObjects.getIterator();         while(theCollection.hasNext()){             Object gwObject = theCollection.getNext();
             if(gwObject instanceof Moveable){
                 if(gwObject instanceof NpcCar){
@@ -556,9 +555,12 @@ public class GameWorld implements Observable, IGameWorld, ActionListener {
 
 
     public void tick(int x){
-        setClock(getClock() +1);
+        called++;
+        if((called%50)==0){
+            setClock(getClock() +1);
+        }
         for(int i = 0; i<=x; i++){
-            updateAllMoveables();
+            updateAllMoveables(called);
             if(getCarFuelLevel() <= 0){
                 loseLife();
             }

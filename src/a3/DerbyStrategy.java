@@ -9,7 +9,7 @@ package a3;
 public class DerbyStrategy implements IStrategy {
     public void apply(NpcCar ncpCar, Object car){
         Car playersCar= (Car)car;
-        Float floatAngle = (float)Math.toDegrees(Math.atan2(playersCar.getLocationY() - ncpCar.getLocationY(),
+        float floatAngle = (float)Math.toDegrees(Math.atan2(playersCar.getLocationY() - ncpCar.getLocationY(),
                 playersCar.getLocationX() - ncpCar.getLocationX()));
         int angle = (int)(double)floatAngle;
         while (angle < 0) {

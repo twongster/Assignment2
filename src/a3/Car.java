@@ -206,6 +206,7 @@ public class Car extends Moveable implements ISteerable, IColorable, IDrawable {
     //updates the heading of the car
     public void updateHeading(){
         int newHeading = this.getHeading() + this.getSteeringDirection();
+        this.setSteeringDirection(0);
         if (newHeading >= 360){
             this.setHeading(newHeading-360);
         } else if(newHeading <= -360){
@@ -290,6 +291,10 @@ public class Car extends Moveable implements ISteerable, IColorable, IDrawable {
             super.move();
             this.decreaseFuel();
         }
+    }
+
+    public void moveNpc(){
+        super.move();
     }
 
 

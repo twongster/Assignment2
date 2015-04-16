@@ -74,7 +74,7 @@ public interface IGameWorld {
 
     Pylon getNextPylon();
 
-    void updateAllMoveables();
+    void updateAllMoveables(int x);
 
     boolean carCanMove();
 

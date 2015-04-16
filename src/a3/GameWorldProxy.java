@@ -174,7 +174,7 @@ public class GameWorldProxy implements IGameWorld, Observable {
     }
 
     @Override
-    public void updateAllMoveables() {
+    public void updateAllMoveables(int x) {
 
     }
 

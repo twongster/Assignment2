@@ -20,7 +20,7 @@ public class NpcCar extends Car implements IDrawable {
         this.setNpcNumber(npcNumber);
         this.setMaximumDamage(200);
         this.setFuelLevel(999999);
-        this.setSpeed(30);
+        this.setSpeed(20);
     }
 
     public int getNpcNumber() {
@@ -47,6 +47,10 @@ public class NpcCar extends Car implements IDrawable {
         String output = "Non-Playable " + super.toString();
         output = output + " Strategy: " + driveStrategy;
         return output;
+    }
+
+    public void move(){
+        super.moveNpc();
     }
 
     @Override

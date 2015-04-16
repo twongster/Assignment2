@@ -46,7 +46,7 @@ public class MapView extends JPanel implements Observer  {
 
     public void update(Observable o) {
         repaint();
-        GameWorldProxy gwp = (GameWorldProxy) o;
+       /*** GameWorldProxy gwp = (GameWorldProxy) o;
         GameObjectCollection gwc = gwp.getWorldObjects();
         Iterator theCollection = gwc.getIterator();
         String output = "";
@@ -54,7 +54,7 @@ public class MapView extends JPanel implements Observer  {
             Object gwObject = theCollection.getNext();
             output = output + gwObject.toString() + "\n";
         }
-        System.out.print(output);
+        System.out.print(output);**/
     }
 
     public void paintComponent(Graphics g){
